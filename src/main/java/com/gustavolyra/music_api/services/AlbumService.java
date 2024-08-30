@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gustavolyra.music_api.config.ItunesClient;
 import com.gustavolyra.music_api.dto.AlbumDto;
 import com.gustavolyra.music_api.dto.ArtistDto;
+import com.gustavolyra.music_api.entities.Album;
+import com.gustavolyra.music_api.entities.Artist;
 import com.gustavolyra.music_api.repositories.AlbumRepository;
 import com.gustavolyra.music_api.repositories.ArtistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +36,10 @@ public class AlbumService {
     private ArtistRepository artistRepository;
 
 
-    @Transactional(readOnly = true)
+    @Transactional()
     public List<AlbumDto> getAlbums(String name) throws JsonProcessingException {
 
-        ResponseEntity<String> response = itunesClient.albumInfo(name, "album");
+        ResponseEntity<String> response = itunesClient.info(name, "album");
         String jsonResponse = response.getBody();
         JsonNode jsonNode = objectMapper.readTree(jsonResponse);
         JsonNode resultNode = jsonNode.get("results");
@@ -48,18 +50,43 @@ public class AlbumService {
             resultNode.forEach(node -> {
                 Long albumId = node.get("collectionId").asLong();
                 Long artistId = node.get("artistId").asLong();
+                String artistName;
+                String albumName;
+                OffsetDateTime releaseDate;
 
                 var artist = artistRepository.findById(artistId);
                 var album = albumRepository.findById(albumId);
 
-                String artistName = (artist.isPresent()) ? artist.get().getName() : node.get("artistName").asText();
-                String albumName = (album.isPresent()) ? album.get().getName() : node.get("collectionName").asText();
-                OffsetDateTime releaseDate = (album.isPresent()) ? album.get().getReleaseDate() : OffsetDateTime.parse(node.get("releaseDate").asText());
+
+                if (album.isPresent()) {
+                    albumName = album.get().getName();
+                    releaseDate = album.get().getReleaseDate();
+                } else {
+                    albumName = node.get("collectionName").asText();
+                    releaseDate = OffsetDateTime.parse(node.get("releaseDate").asText());
+                    Album album1 = new Album();
+                    album1.setName(albumName);
+                    album1.setReleaseDate(releaseDate);
+                    album1.setId(albumId);
+                    albumRepository.save(album1);
+                }
+
+                if (artist.isPresent()) {
+                    artistName = artist.get().getName();
+                } else {
+                    artistName = node.get("artistName").asText();
+                    var albumReference = albumRepository.getReferenceById(albumId);
+                    Artist artist1 = new Artist();
+                    artist1.setName(artistName);
+                    artist1.setId(artistId);
+                    artist1.getAlbums().add(albumReference);
+                    artistRepository.save(artist1);
+                }
+
 
                 albumDtos.add(new AlbumDto(albumId, albumName, releaseDate, new ArtistDto(artistId, artistName)));
             });
         }
-
         return albumDtos;
     }
 

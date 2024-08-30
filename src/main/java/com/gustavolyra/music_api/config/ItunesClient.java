@@ -7,7 +7,7 @@ import org.springframework.web.service.annotation.GetExchange;
 public interface ItunesClient {
 
     @GetExchange("/search")
-    ResponseEntity<String> albumInfo(@RequestParam("term") String term, @RequestParam("entity") String entity);
+    ResponseEntity<String> info(@RequestParam("term") String term, @RequestParam("entity") String entity);
 
 
 }

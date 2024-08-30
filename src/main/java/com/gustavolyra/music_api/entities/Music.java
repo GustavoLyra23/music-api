@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -32,8 +32,18 @@ public class Music {
 
     @ManyToMany(mappedBy = "musics")
     private Set<Artist> artists = new HashSet<>();
-    private LocalDate releaseDate;
+    private OffsetDateTime releaseDate;
     private Long milDuration;
+    private Boolean disabled = false;
+
+
+    public Music(Long id, String name, Long milDuration, OffsetDateTime releaseDate) {
+        this.id = id;
+        this.name = name;
+        this.milDuration = milDuration;
+        this.releaseDate = releaseDate;
+    }
+
 
     @Override
     public boolean equals(Object o) {

@@ -33,7 +33,7 @@ public class Album {
     private Set<Music> albumMusics = new HashSet<>();
 
     private OffsetDateTime releaseDate;
-
+    private Boolean disabled = false;
 
     @Override
     public boolean equals(Object o) {
@@ -47,4 +47,14 @@ public class Album {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    public void addArtist(Artist artist) {
+        artists.add(artist);
+    }
+
+    public void addMusic(Music music) {
+        albumMusics.add(music);
+    }
+
+
 }

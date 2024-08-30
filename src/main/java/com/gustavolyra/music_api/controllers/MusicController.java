@@ -1,9 +1,9 @@
 package com.gustavolyra.music_api.controllers;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gustavolyra.music_api.dto.AlbumDto;
-import com.gustavolyra.music_api.services.AlbumService;
+import com.gustavolyra.music_api.dto.ArtistDto;
+import com.gustavolyra.music_api.dto.MusicDto;
+import com.gustavolyra.music_api.services.MusicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,18 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/albums")
-public class AlbumController {
+@RequestMapping("/musics")
+public class MusicController {
+
 
     @Autowired
-    private AlbumService albumService;
-
+    private MusicService musicService;
 
     @GetMapping("/{name}")
-    public ResponseEntity<List<AlbumDto>> getAlbums(@PathVariable("name") String name) throws JsonProcessingException {
-        var albums = albumService.getAlbums(name);
-        return ResponseEntity.ok(albums);
+    public ResponseEntity<List<MusicDto>> getMusics(@PathVariable("name") String name) throws JsonProcessingException {
+        var musics = musicService.getMusics(name);
+        return ResponseEntity.ok(musics);
     }
-
 
 }

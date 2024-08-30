@@ -34,6 +34,15 @@ public class Artist {
             inverseJoinColumns = @JoinColumn(name = "music_id"))
     private Set<Music> musics = new HashSet<>();
 
+    private Boolean disabled = false;
+
+
+    public Artist(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
