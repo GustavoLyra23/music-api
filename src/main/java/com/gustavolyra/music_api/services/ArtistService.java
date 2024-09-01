@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ArtistService {
@@ -36,6 +38,7 @@ public class ArtistService {
         JsonNode resultNode = jsonNode.get("results");
 
         List<ArtistDto> artists = new ArrayList<>();
+        Set<Long> ids = new HashSet<>();
 
         if (resultNode.isArray()) {
             resultNode.forEach(node -> {
@@ -45,15 +48,26 @@ public class ArtistService {
                 String artistName;
 
                 if (artist.isPresent()) {
-                    artistName = artist.get().getName();
+                    if (artist.get().getDisabled()) {
+                        return;
+                    } else {
+                        artistName = artist.get().getName();
+                    }
                 } else {
                     artistName = node.get("artistName").asText();
                     artistRepository.save(new Artist(artistId, artistName));
                 }
 
+                ids.add(artistId);
                 artists.add(new ArtistDto(artistId, artistName));
             });
         }
+
+        var artistsList = artistRepository.findByName(name);
+        artistsList.stream().filter(x -> !ids.contains(x.getId())).forEach(x -> {
+            artists.add(new ArtistDto(x.getId(), x.getName()));
+        });
+
 
         return artists;
     }

@@ -9,5 +9,7 @@ public interface ItunesClient {
     @GetExchange("/search")
     ResponseEntity<String> info(@RequestParam("term") String term, @RequestParam("entity") String entity);
 
+    @GetExchange("/lookup")
+    ResponseEntity<String> infoById(@RequestParam("id") Long id, @RequestParam("entity") String entity);
 
 }

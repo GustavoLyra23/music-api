@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class MusicService {
@@ -49,6 +51,7 @@ public class MusicService {
         JsonNode resultNode = jsonNode.get("results");
 
         List<MusicDto> musicDtos = new ArrayList<>();
+        Set<Long> ids = new HashSet<>();
 
         if (resultNode.isArray()) {
             resultNode.forEach(node -> {
@@ -93,8 +96,6 @@ public class MusicService {
                     album1.getAlbumMusics().add(music);
                     albumRepository.save(album1);
                 }
-
-
                 if (artist.isPresent()) {
                     artistName = artist.get().getName();
                 } else {
@@ -107,10 +108,13 @@ public class MusicService {
                     artistRepository.save(artist1);
                 }
 
-
-                musicDtos.add(new MusicDto(songId, songName, new ArtistDto(artistId, artistName), new AlbumDtoResponse(albumId, albumName, releaseDate), milDuration, releaseDate));
+                musicDtos.add(new MusicDto(songId, songName,
+                        new ArtistDto(artistId, artistName),
+                        new AlbumDtoResponse(albumId, albumName, releaseDate),
+                        milDuration, releaseDate));
             });
         }
+
 
         return musicDtos;
     }
